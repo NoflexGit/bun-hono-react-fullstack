@@ -58,6 +58,12 @@ const expensesRoutes = new Hono()
 
     return c.json({ expense });
   })
+  .get('/total-spent', (c) => {
+    const result = expenses.reduce((acc, item) => {
+      return (acc += item.amount);
+    }, 0);
+    return c.json({ total: result });
+  })
   .delete('/:id{[0-9]+}', (c) => {
     const id = parseInt(c.req.param('id'));
     const expense = expenses.find((expense) => expense.id === id);
