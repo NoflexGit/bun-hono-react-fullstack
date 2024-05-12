@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import z from 'zod';
 import { zValidator } from '@hono/zod-validator';
+import { getUserMiddleware } from '../kinde.ts';
 
 const expenseSchema = z.object({
   id: z.number().int().positive(),
@@ -41,14 +42,19 @@ const expenses: Expense[] = [
 ];
 
 const expensesRoutes = new Hono()
-  .get('/', (c) => c.json({ expenses }))
-  .post('/', zValidator('json', createExpenseSchema), async (c) => {
-    const expense = await c.req.valid('json');
-    expenses.push({ id: expenses.length + 1, ...expense });
+  .get('/', getUserMiddleware, (c) => c.json({ expenses }))
+  .post(
+    '/',
+    getUserMiddleware,
+    zValidator('json', createExpenseSchema),
+    async (c) => {
+      const expense = await c.req.valid('json');
+      expenses.push({ id: expenses.length + 1, ...expense });
 
-    return c.json({ expense: c.body });
-  })
-  .get('/:id{[0-9]+}', (c) => {
+      return c.json({ expense: c.body });
+    },
+  )
+  .get('/:id{[0-9]+}', getUserMiddleware, (c) => {
     const id = parseInt(c.req.param('id'));
     const expense = expenses.find((expense) => expense.id === id);
 
@@ -58,13 +64,13 @@ const expensesRoutes = new Hono()
 
     return c.json({ expense });
   })
-  .get('/total-spent', (c) => {
+  .get('/total-spent', getUserMiddleware, (c) => {
     const result = expenses.reduce((acc, item) => {
       return (acc += item.amount);
     }, 0);
     return c.json({ total: result });
   })
-  .delete('/:id{[0-9]+}', (c) => {
+  .delete('/:id{[0-9]+}', getUserMiddleware, (c) => {
     const id = parseInt(c.req.param('id'));
     const expense = expenses.find((expense) => expense.id === id);
 
