@@ -11,7 +11,7 @@ const CreateExpense = () => {
   const form = useForm({
     defaultValues: {
       title: '',
-      amount: 0,
+      amount: '0',
     },
     onSubmit: async ({ value }) => {
       const response = await api.expenses.$post({ json: value });
@@ -62,7 +62,7 @@ const CreateExpense = () => {
               value={field.state.value}
               onBlur={field.handleBlur}
               placeholder="Enter the amount"
-              onChange={(e) => field.handleChange(Number(e.target.value))}
+              onChange={(e) => field.handleChange(e.target.value)}
             />
             {field.state.meta.touchedErrors && (
               <p>{field.state.meta.touchedErrors}</p>
