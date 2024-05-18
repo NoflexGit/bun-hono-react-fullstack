@@ -1,5 +1,7 @@
 import React from 'react';
 import { createLazyFileRoute, useNavigate } from '@tanstack/react-router';
+import { zodValidator } from '@tanstack/zod-form-adapter';
+import { z } from 'zod';
 import { useForm } from '@tanstack/react-form';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -22,6 +24,7 @@ const CreateExpense = () => {
 
       navigate({ to: '/' });
     },
+    validatorAdapter: zodValidator,
   });
 
   const handleSubmitForm = (e: React.FormEvent<HTMLFormElement>) => {
@@ -33,6 +36,12 @@ const CreateExpense = () => {
   return (
     <form onSubmit={handleSubmitForm}>
       <form.Field
+        validators={{
+          onChange: z
+            .string()
+            .min(3, 'Title must be at least 3 characters')
+            .max(255, 'Title must be at most 255 characters'),
+        }}
         name="title"
         children={(field) => (
           <div className="mb-4 space-y-2">

@@ -78,6 +78,7 @@ const expensesRoutes = new Hono()
   })
   .delete('/:id{[0-9]+}', getUserMiddleware, async (c) => {
     const id = parseInt(c.req.param('id'));
+    const user = c.var.user;
 
     const expense = await db
       .delete(expensesTable)
